@@ -17,6 +17,8 @@ class MinilotoPastUrl extends Model
      * @var array
      */
     protected $fillable = [
-        'url'
+        'url',
+        'async',
+        'already_acquired'
     ];
 }

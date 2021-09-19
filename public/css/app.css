@@ -1,0 +1,39 @@
+.main-content {
+  margin-top: 70px;
+}
+
+table .times {
+  width: 80px;
+  text-align: center;
+}
+table .times.align-left {
+  text-align: left;
+}
+table .lottery-date {
+  width: 120px;
+  text-align: center;
+}
+table .lottery-date.align-left {
+  text-align: left;
+}
+table .number-area {
+  width: 550px;
+}
+table .number-area div {
+  display: flex;
+}
+table .number-area div span {
+  display: block;
+  width: 20px;
+  text-align: center;
+  opacity: 0.8;
+}
+table .number-area div span.one-degit {
+  width: 12px;
+}
+table .number-area div span.per-number {
+  background-color: #9fe9f3;
+}
+table .bonus-number {
+  text-align: center;
+}

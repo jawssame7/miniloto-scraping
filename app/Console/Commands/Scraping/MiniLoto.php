@@ -76,8 +76,8 @@ class MiniLoto extends Command
             if ($urlData->async) {
 
                 $asyncUrls[] = $urlData->url;
-                $data = $this->asyncCrawl($chrome, $urlData->url);
-                dump($data);
+                // $data = $this->asyncCrawl($chrome, $urlData->url);
+                // dump($data);
             }
 
 
@@ -87,8 +87,10 @@ class MiniLoto extends Command
 
 
         foreach($asyncUrls as $url) {
+            sleep(3);
             $data = $this->asyncCrawl($chrome, $url);
-                dump($data);
+            dump($data);
+            DB::table('miniloto_results')->insert($data);
         }
 
         // $results = $this->crawl('https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/backnumber/loto0001.html');
@@ -145,7 +147,7 @@ class MiniLoto extends Command
     private function getPastResultUrls ()
     {
 
-        $result = MinilotoPastUrl::get();
+        $result = MinilotoPastUrl::where('already_acquired', 0)->get();
 
         //dump($result);
 
@@ -282,13 +284,12 @@ class MiniLoto extends Command
      */
     private function asyncCrawl($chrome, $url)
     {
+        $title = $this->transeformTitle($url);
         $data = [];
 
         $chrome->get($url);
         // ページタイトル現れるまでまつ
-        $chrome->wait()->until(
-            WebDriverExpectedCondition::titleIs('')
-        );
+        $chrome->wait();
 
         sleep(3);
 
@@ -297,6 +298,8 @@ class MiniLoto extends Command
 
         // データを抜き出す
         foreach($resultTr as $tr) {
+
+            $ret = [];
             $timesEl = $tr->findElement(WebDriverBy::tagName('th'));
             $times = $timesEl->getText();
 
@@ -319,14 +322,60 @@ class MiniLoto extends Command
                 $cnt++;
             }
 
-            $data['times'] = $times;
-            $data['lottery_date'] = $times;
-            $data['per_numbers'] = implode(',', $results);
-            $data['bonus_number'] = $bonusNumber;
+            $ret['times'] = $times;
+            $ret['lottery_date'] = $lotteryDate;
+            $ret['per_numbers'] = implode(',', $results);
+            $ret['bonus_number'] = $bonusNumber;
+
+            $data[] = $ret;
 
         }
 
         return $data;
+    }
+
+    /**
+     * urlのクエリからタイトルの文字列を生成
+     */
+    private function transeformTitle($url = '')
+    {
+        if ($url === '') {
+            return false;
+        }
+
+        $titlePreffix = '過去の当せん番号案内(ミニロト) ';
+        $titleTimesPreffix = '第';
+        $titleTimesSuffix = '回';
+        $dash = '〜';
+        $title = '';
+
+        // $ret = [];
+        // parse_str($url, $ret);
+
+        // $times = $ret[1];
+
+        $urlSplit = explode('?', $url);
+        //var_dump($urlSplit);
+
+        $querySplit = explode('&', $urlSplit[1]);
+
+        //var_dump($querySplit);
+
+        $ret = [];
+        parse_str($urlSplit[1], $ret);
+
+        //var_dump($ret);
+
+
+        dump($ret);
+
+        if (!empty($ret['fromto'])) {
+            $times = explode('_', $ret['fromto']);
+            $title = $titlePreffix . $titleTimesPreffix . $times[0] . $titleTimesSuffix . $dash . $times[1] . $titleTimesSuffix;
+        }
+
+        return $title;
+
     }
 
 }

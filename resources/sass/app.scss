@@ -1,0 +1,48 @@
+// @import "~semantic-ui-sass/semantic-ui";
+
+.main-content {
+    margin-top: 70px;
+}
+
+table {
+    .times {
+        width: 80px;
+        text-align: center;
+        &.align-left {
+            text-align: left;
+        }
+    }
+    .lottery-date {
+        width: 120px;
+        text-align: center;
+        &.align-left {
+            text-align: left;
+        }
+    }
+    .number-area {
+        width: 550px;
+        div {
+            display: flex;
+            span {
+                display: block;
+                width: 20px;
+                text-align: center;
+                opacity: .8;
+                &.one-degit {
+                    width: 12px;
+                }
+                &.per-number {
+                    background-color: #9fe9f3;
+                }
+            }
+        }
+
+    }
+
+    .bonus-number {
+        text-align: center;
+    }
+
+
+}
+

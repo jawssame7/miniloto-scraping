@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnMinilotoPastUsls extends Migration
+class AddColumnMinilotoPastUrls extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,7 @@ class AddColumnMinilotoPastUsls extends Migration
     {
         //
         Schema::table('miniloto_past_urls', function (Blueprint $table) {
-            $table->boolean('async');
+            $table->boolean('already_acquired');
         });
     }
 
