@@ -5,6 +5,11 @@ namespace App\Console\Commands\Scraping;
 use App\Models\MinilotoResult;
 use App\Models\MinilotoPastUrl;
 use DateTime;
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverExpectedCondition;
 use Illuminate\Console\Command;
 use Goutte\Client;
 use Illuminate\Support\Facades\DB;
@@ -49,16 +54,41 @@ class MiniLoto extends Command
 
         $urls = $this->getPastResultUrls();
 
+        $chrome = $this->initSeleniumDriver();
+
+        $asyncUrls = [];
+
         // 520回以降が動的
         foreach ($urls as $urlData) {
 
             # code...
-            dump($urlData);
-            sleep(2);
-            $results = $this->crawl($urlData->url);
-            $results = $this->transformModel($results);
+            // dump($urlData);
+            //sleep(2);
+            // $results = $this->crawl($urlData->url);
+            // $results = $this->transformModel($results);
 
-            DB::table('miniloto_results')->insert($results);
+            // DB::table('miniloto_results')->insert($results);
+
+            // 対象ページが非同期でデータ取得している場合
+            // https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/backnumber/detail.html?fromto=1081_1091&type=miniloto
+
+
+            if ($urlData->async) {
+
+                $asyncUrls[] = $urlData->url;
+                $data = $this->asyncCrawl($chrome, $urlData->url);
+                dump($data);
+            }
+
+
+
+
+        }
+
+
+        foreach($asyncUrls as $url) {
+            $data = $this->asyncCrawl($chrome, $url);
+                dump($data);
         }
 
         // $results = $this->crawl('https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/backnumber/loto0001.html');
@@ -68,6 +98,43 @@ class MiniLoto extends Command
 
         // // MinilotoResult::create($results);
         // DB::table('miniloto_results')->insert($results);
+
+        // $retUrl = 'https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/backnumber/detail.html?fromto=1081_1091&type=miniloto';
+
+        // $data = $this->asyncCrawl($chrome, $retUrl);
+        // dump($data);
+
+        // $chrome->get($retUrl);
+        // // ページタイトル現れるまでまつ
+        // $chrome->wait();
+
+        // $resultTable = $chrome->findElement(WebDriverBy::cssSelector('table.typeTK'));
+        // $resultTr = $resultTable->findElements(WebDriverBy::cssSelector('tr.js-lottery-backnumber-temp-pc'));
+
+        // // データを抜き出す
+        // foreach($resultTr as $tr) {
+        //     $timesEl = $tr->findElement(WebDriverBy::tagName('th'));
+        //     $times = $timesEl->getText();
+
+        //     $tds = $tr->findElements(WebDriverBy::tagName('td'));
+
+        //     $lotteryDate = '';
+        //     $results = [];
+
+        //     $cnt = 0;
+        //     foreach($tds as $td) {
+        //         $css = $td->getCSSValue('js-lottery-date');
+        //         // 0番目は開催日
+        //         if ($cnt === 0)  {
+        //             $lotteryDate =  $td->getText();
+        //         } else {
+        //             $results[] = $td->getText();
+        //         }
+        //         $cnt++;
+        //     }
+
+        // }
+
 
         return 0;
     }
@@ -180,4 +247,86 @@ class MiniLoto extends Command
     {
         return preg_replace('/( |　)/', ',', $value);
     }
+
+    /**
+     * seleniumドライバーを初期化したインスタンス
+     */
+    private function initSeleniumDriver()
+    {
+
+        // Chrome機能を管理するクラスのインスタンス化
+        $options = new ChromeOptions();
+        // Chrome起動時のオプション指定
+        $options->addArguments([
+            '--no-sandbox',
+            '--headless'
+        ]);
+
+        // Chromeブラウザを起動
+        $caps = DesiredCapabilities::chrome();
+        $caps->setCapability(ChromeOptions::CAPABILITY, $options);
+        // ブラウザを実行するプラットフォームを指定。クロームとのセッションがスムーズになる？？？
+        $caps->setPlatform('LINUX');
+
+        // hostを指定（docker-compose ）
+        $host = 'http://selenium:4444/wd/hub';
+
+        $driver = RemoteWebDriver::create($host, $caps, 60000, 60000);
+
+        return $driver;
+    }
+
+    /**
+     * 非同期でデータを取得する結果ページからデータを取得する。
+     *
+     */
+    private function asyncCrawl($chrome, $url)
+    {
+        $data = [];
+
+        $chrome->get($url);
+        // ページタイトル現れるまでまつ
+        $chrome->wait()->until(
+            WebDriverExpectedCondition::titleIs('')
+        );
+
+        sleep(3);
+
+        $resultTable = $chrome->findElement(WebDriverBy::cssSelector('table.typeTK'));
+        $resultTr = $resultTable->findElements(WebDriverBy::cssSelector('tr.js-lottery-backnumber-temp-pc'));
+
+        // データを抜き出す
+        foreach($resultTr as $tr) {
+            $timesEl = $tr->findElement(WebDriverBy::tagName('th'));
+            $times = $timesEl->getText();
+
+            $tds = $tr->findElements(WebDriverBy::tagName('td'));
+
+            $lotteryDate = null;
+            $bonusNumber = null;
+            $results = [];
+
+            $cnt = 0;
+            foreach($tds as $td) {
+                // 0番目は開催日
+                if ($cnt === 0)  {
+                    $lotteryDate =  $td->getText();
+                } else if ($cnt === 6) {
+                    $bonusNumber = $td->getText();
+                } else {
+                    $results[] = $td->getText();
+                }
+                $cnt++;
+            }
+
+            $data['times'] = $times;
+            $data['lottery_date'] = $times;
+            $data['per_numbers'] = implode(',', $results);
+            $data['bonus_number'] = $bonusNumber;
+
+        }
+
+        return $data;
+    }
+
 }
