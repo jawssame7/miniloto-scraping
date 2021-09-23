@@ -15,36 +15,47 @@
         </form>
     </div>
     <div class="ui segment">
-        <table>
-            <thead>
-                <tr>
-                    <th class="times">回</th>
-                    <th class="lottery-date">抽選日</th>
-                    <th class="number-area">番号</th>
-                    <th class="bonus-number">ボーナス数字</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($minilotoResults as $result)
-                <tr>
-                    <td class="times align-left">{{$result->times}}</td>
-                    <td class="lottery-date align-left">{{$result->lottery_date}}</td>
-                    <td class="number-area">
-                        <div>
-                            @for ($i = 0; $i < 31; $i++)
-                            @php
-                                $retNum = $i + 1;
-                                $num = $i < 9 ? '0'.$i + 1 : $i + 1;
-                                $perNums = explode(',', $result->per_numbers);
-                            @endphp
-                            <span class="{{in_array($num, $perNums) ? 'per-number' : ''}}">{{$num}}</span>
-                            @endfor
-                        </div>
-                    </td>
-                    <td class="bonus-number">{{$result->bonus_number}}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="ui grid">
+            <div class="row">
+                <div class="column">
+                    <button class="ui teal button right floated small add-row" >行追加</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <table class="ui single line table result">
+                        <thead>
+                            <tr>
+                                <th class="times">回</th>
+                                <th class="lottery-date">抽選日</th>
+                                <th class="number-area">番号</th>
+                                <th class="bonus-number">ボーナス数字</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($minilotoResults as $result)
+                            <tr>
+                                <td class="times align-left">{{$result->times}}</td>
+                                <td class="lottery-date align-left">{{$result->lottery_date}}</td>
+                                <td class="number-area">
+                                    <div>
+                                        @for ($i = 0; $i < 31; $i++)
+                                        @php
+                                            $retNum = $i + 1;
+                                            $num = $i < 9 ? '0'.$i + 1 : $i + 1;
+                                            $perNums = explode(',', $result->per_numbers);
+                                        @endphp
+                                        <span class="{{in_array($num, $perNums) ? 'per-number' : ''}}">{{$num}}</span>
+                                        @endfor
+                                    </div>
+                                </td>
+                                <td class="bonus-number">{{$result->bonus_number}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection

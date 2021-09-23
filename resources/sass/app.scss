@@ -1,10 +1,21 @@
 // @import "~semantic-ui-sass/semantic-ui";
 
+html {
+    font-size: 12px;
+}
+
 .main-content {
     margin-top: 70px;
 }
 
+
 table {
+    tr {
+        td {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+    }
     .times {
         width: 80px;
         text-align: center;
@@ -33,6 +44,10 @@ table {
                 }
                 &.per-number {
                     background-color: #9fe9f3;
+                }
+
+                &.forecast-color {
+                    background-color: #f39fd0;
                 }
             }
         }

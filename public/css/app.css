@@ -1,7 +1,15 @@
+html {
+  font-size: 12px;
+}
+
 .main-content {
   margin-top: 70px;
 }
 
+table tr td {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
 table .times {
   width: 80px;
   text-align: center;
@@ -33,6 +41,9 @@ table .number-area div span.one-degit {
 }
 table .number-area div span.per-number {
   background-color: #9fe9f3;
+}
+table .number-area div span.forecast-color {
+  background-color: #f39fd0;
 }
 table .bonus-number {
   text-align: center;
