@@ -152,11 +152,20 @@ function submitMiniLotoForecast(forecastTrs) {
     data: JSON.stringify(data)
   }).done(function (res) {
     console.log(res);
-    $(".success-modal").modal({
-      onApprove: function onApprove() {
-        location.reload();
-      }
-    }).modal("show");
+
+    if (res.success) {
+      $(".success-modal").modal({
+        onApprove: function onApprove() {
+          location.reload();
+        }
+      }).modal("show");
+    } else {
+      $(".failure-modal").modal({
+        onApprove: function onApprove() {
+          location.reload();
+        }
+      }).modal("show");
+    }
   });
 }
 
