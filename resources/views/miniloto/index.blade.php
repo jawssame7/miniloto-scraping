@@ -18,7 +18,13 @@
         <div class="ui grid">
             <div class="row">
                 <div class="column">
-                    <button class="ui teal button right floated small add-row" >行追加</button>
+                    <button class="ui blue button right floated tiny add-forecast" >予想を記録しておく</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="column">
+                    <button class="ui teal button right floated tiny add-row" >予想追加（行追加）</button>
+                    <button class="ui button right floated tiny all-display">すべて表示</button>
                 </div>
             </div>
             <div class="row">
@@ -34,7 +40,7 @@
                         </thead>
                         <tbody>
                             @foreach ($minilotoResults as $result)
-                            <tr>
+                            <tr class="result-row">
                                 <td class="times align-left">{{$result->times}}</td>
                                 <td class="lottery-date align-left">{{$result->lottery_date}}</td>
                                 <td class="number-area">
@@ -58,4 +64,7 @@
             </div>
         </div>
     </div>
+    <x-confirm_modal message='予想を記録しますか？' modalCls='forecast-add-confirm' btnCls='hoge' />
+    <x-success_modal message='記録しました'/>
+    <x-failure_modal/>
 @endsection

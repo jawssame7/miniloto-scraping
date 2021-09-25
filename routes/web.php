@@ -14,12 +14,17 @@ use App\Http\Controllers\MiniLotoController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 Route::get('/', function () {
-    return redirect('/miniloto');
+    return view('welcome');
 });
 
-Route::resource('/miniloto', MiniLotoController::class);
+// Route::get('/', function () {
+//     return redirect('/miniloto');
+// });
+
+// Route::get('/miniloto', [MiniLotoController::class, 'index']);
+Route::resource('miniloto', MiniLotoController::class)->only([
+    'index'
+]);
+Route::get('/miniloto/collation', [MiniLotoController::class, 'collation'])->name('miniloto.collation');
+Route::post('/miniloto/forecast', [MiniLotoController::class, 'forecast_add']);
