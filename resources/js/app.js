@@ -172,7 +172,7 @@ function submitMiniLotoForecast(forecastTrs) {
 
     data.push({
       times: times,
-      eventDate: lotteryDate,
+      lotteryDate: lotteryDate,
       perNumbers: perNumbers.join(","),
     });
   });

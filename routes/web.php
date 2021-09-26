@@ -16,7 +16,7 @@ use App\Http\Controllers\MiniLotoController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 // Route::get('/', function () {
 //     return redirect('/miniloto');
@@ -26,5 +26,6 @@ Route::get('/', function () {
 Route::resource('miniloto', MiniLotoController::class)->only([
     'index'
 ]);
+// アクション名（route(アクション名)）で取得できる
 Route::get('/miniloto/collation', [MiniLotoController::class, 'collation'])->name('miniloto.collation');
 Route::post('/miniloto/forecast', [MiniLotoController::class, 'forecast_add']);

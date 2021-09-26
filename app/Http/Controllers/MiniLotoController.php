@@ -33,7 +33,8 @@ class MiniLotoController extends Controller
     /**
      * 予想登録アクション
      */
-    public function forecast_add(Request $request) {
+    public function forecast_add(Request $request)
+    {
 
         $data = [];
         $data['success'] = false;
@@ -46,7 +47,7 @@ class MiniLotoController extends Controller
         foreach($json as $d) {
             $ret = [
                 'times' => $d['times'],
-                'event_date' => $d['eventDate'],
+                'lottery_date' => $d['lotteryDate'],
                 'per_numbers' => $d['perNumbers'],
                 'created_at' => new DateTime(),
                 'updated_at' => new DateTime()
@@ -60,13 +61,45 @@ class MiniLotoController extends Controller
         } else {
             $data['message'] = 'データの登録に失敗しました。';
         }
-
-        // MinilotoForecast->insert();
         // json レスポンス
         return response()->json($data);
     }
 
-    public function collation() {
-        return view('miniloto.collation');
+
+
+    public function collation()
+    {
+        $ret = null;
+        $lotteryDate = null;
+        $forecastResults = [];
+
+        // 最新の一件取得
+        $resultQuery = MinilotoResult::query();
+        $resultQuery->orderBy('id', 'desc');
+        $resultQuery->limit(1);
+        $minilotoResults = $resultQuery->get();
+
+        if (!empty($minilotoResults[0])) {
+            $ret = $minilotoResults[0];
+        }
+
+        if (!empty($ret)) {
+            $lotteryDate = $ret->lottery_date;
+        }
+
+        // 最新一件と同じ予想結果を取得
+        if (!empty($lotteryDate)) {
+            $forecastQuery = MinilotoForecast::query();
+            $forecastQuery->where('lottery_date', $lotteryDate);
+            $forecastResults = $forecastQuery->get();
+        }
+
+
+        //dd($minilotoResults, $forecastResults);
+
+        return view('miniloto.collation', [
+            'minilotoResults' => $minilotoResults,
+            'forecastResults' => $forecastResults
+        ]);
     }
 }

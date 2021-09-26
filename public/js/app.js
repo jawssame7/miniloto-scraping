@@ -136,7 +136,7 @@ function submitMiniLotoForecast(forecastTrs) {
     console.log(times, lotteryDate, perNumbers);
     data.push({
       times: times,
-      eventDate: lotteryDate,
+      lotteryDate: lotteryDate,
       perNumbers: perNumbers.join(",")
     });
   }); // データ登録

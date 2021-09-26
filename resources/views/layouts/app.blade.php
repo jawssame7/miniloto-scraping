@@ -12,9 +12,33 @@
 <body>
 <div class="ui fixed inverted menu">
     <div class="ui container">
-        <a href="{{route('miniloto.index')}}" class="header item title">
+        <a href="{{route('welcome')}}" class="header item title">
             <span class="menu-main-title">ロト予想</span>
         </a>
+        <div class="ui simple dropdown item">
+            ミニロト
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <a class="item" href="{{route('miniloto.index')}}">結果</a>
+                <a class="item" href="{{route('miniloto.collation')}}">最新の結果と予想の照合</a>
+            </div>
+        </div>
+        <div class="ui simple dropdown item">
+            ロト6
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <a class="item" href="">結果</a>
+                <a class="item" href="">最新の結果と予想の照合</a>
+            </div>
+        </div>
+        <div class="ui simple dropdown item">
+            ロト7
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <a class="item" href="">結果</a>
+                <a class="item" href="">最新の結果と予想の照合</a>
+            </div>
+        </div>
     </div>
 </div>
 <div class="content ui container main-content">
