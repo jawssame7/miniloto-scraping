@@ -212,6 +212,12 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 
 
 table {
+
+    display: block;
+    overflow-x: scroll;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+
     tr {
         td {
             padding-top: 0 !important;
