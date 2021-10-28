@@ -1,0 +1,41 @@
+name: only master branch
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: rsync deployments
+      uses: burnett01/rsync-deployments@5.1
+      with:
+        switches: -avzr --delete
+        path: /
+        remote_path: ${{ secrets.DEPLOY_PATH }}
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_port: ${{ secrets.REMOTE_PORT }}
+        remote_user: ${{ secrets.REMOTE_USER }}
+        remote_key: ${{ secrets.REMOTE_KEY }}
+        remote_key_pass: ${{ secrets.REMOTE_KEY_PASS }}
+
+# jobs:
+#   deploy:
+
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v1
+#       - name: composer install
+#       - name: add permission
+#         run: chmod -R g+w app && sudo groupadd -f apache && sudo chown -R :apache app
+#       - name: ssh key generate
+#         run: echo ”$SSH_PRIVATE_KEY” ＞ key && chmod 600 key
+#         env:
+#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#       - name: rsync deploy
+#         run: rsync -rptgDvz --delete --exclude-from=api/.rsyncignore -e ”ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no” miniloto-scraping/ web@ik1-344-32290.vs.sakura.ne.jp/home/web/workspace/test/
+#       - name: migrate database
+#         run: ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no web@ik1-344-32290.vs.sakura.ne.jp ’cd /home/web/workspace && php artisan migrate’
