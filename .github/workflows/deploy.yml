@@ -4,23 +4,6 @@ on:
   push:
     branches:
       - master
-# jobs:
-#   deploy:
-#     runs-on: ubuntu-latest
-    # steps:
-    # - uses: actions/checkout@v2
-    # - name: rsync deployments
-    #   uses: burnett01/rsync-deployments@5.1
-    #   with:
-    #     switches: -avzr --delete
-    #     path: app/
-    #     remote_path: ${{ secrets.DEPLOY_PATH }}
-    #     remote_host: ${{ secrets.REMOTE_HOST }}
-    #     remote_port: ${{ secrets.REMOTE_PORT }}
-    #     remote_user: ${{ secrets.REMOTE_USER }}
-    #     remote_key: ${{ secrets.REMOTE_KEY }}
-    #     remote_key_pass: ${{ secrets.REMOTE_KEY_PASS }}
-
 jobs:
   deploy:
 
