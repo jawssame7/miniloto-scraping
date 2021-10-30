@@ -1,31 +1,49 @@
-name: only master branch
-
+name: sample-deploy
 on:
   push:
     branches:
       - master
+
 jobs:
   deploy:
-
+    name: sample
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
+      - name: cache vendor
+        id: cache
+        uses: actions/cache@v1
         with:
-          ref: master
-      - name: ssh key generate
-        run: echo "$SSH_SECRET_KEY" > key && chmod 600 key
-        env:
-          SSH_SECRET_KEY: ${{ secrets.SSH_SECRET_KEY }}
-      - name: composer install
-      - name: add permission
-        run: chmod -R g+w app && sudo groupadd -f apache && sudo chown -R :apache app
-      - name: ssh key generate
-        run: echo ”$SSH_PRIVATE_KEY” ＞ key && chmod 600 key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: rsync deploy
-        # rsync -avzre "ssh -i /Users/sameshima/.ssh/sakura-vps-github" /Users/sameshima/test web@ik1-344-32290.vs.sakura.ne.jp:/home/web/temp/
-        run: rsync -arptgDvze --delete --exclude-from=.rsyncignore -e ”ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no” miniloto-scraping/  ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/home/web/workspace/test/
-      - name: migrate database
-        run: ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no web@ik1-344-32290.vs.sakura.ne.jp ’cd /home/web/workspace/test && php artisan migrate’
+          path: ./vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Composer install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: composer install -n --prefer-dist
+
+      - name: Copy .env
+        run: cp .env.deploy .env
+
+      - name: generate key
+        run: php artisan key:generate
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install Dependencies
+        run: |
+          npm install serverless -g
+          npm install
+
+      - name: install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 必須
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.KNOWN_HOSTS }} # 必須
+      - name: deploy
+        run: bash deploy.sh
