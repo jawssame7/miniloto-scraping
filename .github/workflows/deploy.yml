@@ -1,51 +1,51 @@
-name: laravel-deploy
-on:
-  push:
-    branches:
-      - master
+// name: laravel-deploy
+// on:
+//   push:
+//     branches:
+//       - master
 
-jobs:
-  deploy:
-    name: sample
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: cache vendor
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: ./vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+// jobs:
+//   deploy:
+//     name: sample
+//     runs-on: ubuntu-latest
+//     steps:
+//       - uses: actions/checkout@v2
+//       - name: cache vendor
+//         id: cache
+//         uses: actions/cache@v1
+//         with:
+//           path: ./vendor
+//           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+//           restore-keys: |
+//             ${{ runner.os }}-composer-
 
-      - name: Composer install
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: composer install -n --prefer-dist
+//       - name: Composer install
+//         if: steps.cache.outputs.cache-hit != 'true'
+//         run: composer install -n --prefer-dist
 
-      - name: Copy .env
-        run: cp .env.deploy .env
+//       - name: Copy .env
+//         run: cp .env.deploy .env
 
-      - name: generate key
-        run: php artisan key:generate
+//       - name: generate key
+//         run: php artisan key:generate
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
+//       - name: Setup Node.js
+//         uses: actions/setup-node@v1
+//         with:
+//           node-version: "12.x"
 
-      - name: Install Dependencies
-        run: |
-          npm install serverless -g
-          npm install
+//       - name: Install Dependencies
+//         run: |
+//           npm install serverless -g
+//           npm install
 
-      - name: install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }} # 必須
-          name: id_rsa # optional
-          known_hosts: ${{ secrets.KNOWN_HOSTS }} # 必須
-      - name: rsync
-        run: rsync -acvz --delete -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" ./ web@ik1-344-32290.vs.sakura.ne.jp:/home/web/workspace/miniloto/
-      - name: docker compose run
-        run: ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no web@ik1-344-32290.vs.sakura.ne.jp "cd /home/web/workspace/miniloto/; docker-compose build; docker-compose down; docker-compose up -d"
+//       - name: install SSH key
+//         uses: shimataro/ssh-key-action@v2
+//         with:
+//           key: ${{ secrets.SSH_PRIVATE_KEY }} # 必須
+//           name: id_rsa # optional
+//           known_hosts: ${{ secrets.KNOWN_HOSTS }} # 必須
+//       - name: rsync
+//         run: rsync -acvz --delete -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" ./ ubuntu@ik1-344-32290.vs.sakura.ne.jp:/home/ubuntu/workspace/miniloto-scraping/
+//       // - name: docker compose run
+//       //   run: ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no web@ik1-344-32290.vs.sakura.ne.jp "cd /home/web/workspace/miniloto/; docker-compose build; docker-compose down; docker-compose up -d"
