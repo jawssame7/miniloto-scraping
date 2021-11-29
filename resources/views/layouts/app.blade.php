@@ -7,7 +7,7 @@
     <title>ロト予想</title>
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/semantic.min.css') }}">
-    <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
 </head>
 <body>
 <div class="ui fixed inverted menu">
